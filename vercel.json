@@ -1,7 +1,6 @@
 
 {
-  "ve{
-  "version": 2,
+    "version": 2,
   "builds": [
     {
       "src": "api/index.js",
