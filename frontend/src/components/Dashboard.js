@@ -1,6 +1,7 @@
 // frontend/src/components/Dashboard.js
 import React, { useEffect, useState } from 'react';
-import './Dashboard.css'; // You can style cards here
+import { supabase } from '../supabaseClient'; // ✅ Import Supabase client
+import './Dashboard.css';
 
 const metrics = [
   { key: 'kyc_updation', label: 'KYC Updation' },
@@ -18,9 +19,19 @@ const Dashboard = () => {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    fetch('/api/dashboard')
-      .then(res => res.json())
-      .then(json => setData(json));
+    const fetchData = async () => {
+      const { data, error } = await supabase
+        .from('branch_data')
+        .select('*');
+
+      if (error) {
+        console.error('Error fetching data:', error);
+      } else {
+        setData(data);
+      }
+    };
+
+    fetchData();
   }, []);
 
   return (
