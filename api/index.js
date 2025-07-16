@@ -1,48 +1,25 @@
-const express = require('express');
-const { Pool } = require('pg');
-const app = express();
+import pg from 'pg';
+const { Pool } = pg;
 
-// Enable JSON parsing
-app.use(express.json());
-
-// Connect to Neon PostgreSQL using DATABASE_URL from Vercel env
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false,
-  },
+  host: process.env.SUPABASE_HOST,
+  user: process.env.SUPABASE_USER,
+  password: process.env.SUPABASE_PASS,
+  database: process.env.SUPABASE_DB,
+  port: Number(process.env.SUPABASE_PORT),
+  ssl: { rejectUnauthorized: false }
 });
 
-// Basic test route
-app.get('/api/hello', (req, res) => {
-  res.json({ message: 'Hello from SBI OpsVision backend!' });
-});
-
-// New route to fetch all branch data
-app.get('/api/branches', async (req, res) => {
+export default async function handler(req, res) {
+  const client = await pool.connect();
   try {
-    const result = await pool.query('SELECT * FROM branch_data ORDER BY branch_name');
-    res.json(result.rows);
+    const result = await client.query('SELECT * FROM branch_data');
+    res.status(200).json(result.rows);
   } catch (err) {
-    console.error(err);
+    console.error('Query error:', err);
     res.status(500).json({ error: 'Database error' });
+  } finally {
+    client.release();
   }
-});
+}
 
-// (Optional) Route to insert daily branch data (POST)
-app.post('/api/branches', async (req, res) => {
-  const { branch_name, kyc_pending, kyc_completed } = req.body;
-  try {
-    const result = await pool.query(
-      `INSERT INTO branch_data (branch_name, kyc_pending, kyc_completed) 
-       VALUES ($1, $2, $3) RETURNING *`,
-      [branch_name, kyc_pending, kyc_completed]
-    );
-    res.json(result.rows[0]);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Failed to insert data' });
-  }
-});
-
-module.exports = app;
