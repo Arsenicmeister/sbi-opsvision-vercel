@@ -1,8 +1,7 @@
 {
   "name": "opsvision-360-frontend",
   "version": "1.0.0",
-  "private": true,
-  "engines": {
+    "engines": {
     "node": ">=20.x"
   },
   "dependencies": {
