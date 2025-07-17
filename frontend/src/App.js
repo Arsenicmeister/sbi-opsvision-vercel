@@ -1,13 +1,15 @@
+// frontend/src/App.js
 import React from 'react';
-import Dashboard from './components/Dashboard';
+import Dashboard from './components/Dashboard';  // ✅ Make sure this path is correct
 
 function App() {
   return (
     <div className="App">
-      <Dashboard />
+      <Dashboard />   {/* ✅ This renders the dashboard */}
     </div>
   );
 }
 
 export default App;
+
 
